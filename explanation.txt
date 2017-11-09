@@ -1,1 +1,7 @@
-Put your Project 5 brief explanation, as directed, here.
+I am accessing the Eventbrite API and gathering:
+- 50 upcoming Events that within 10 miles of Ann Arbor and 50 upcoming Events that within 10 miles of Champaign
+- For each Events, I¡¯ll be accessing the event title, id, start time, end time, URL to the event page and whether the event is free.
+- I¡¯ll write 2 CSV files, one for events in Ann Arbor one for events in Champaign
+- Data in each CSV file: 6 columns - name, id, start, end, url, free
+- URL for the API: https://www.eventbrite.com/developer/v3/
+- URL describing the authentication process for the API: https://www.eventbrite.com/developer/v3/api_overview/authentication/
