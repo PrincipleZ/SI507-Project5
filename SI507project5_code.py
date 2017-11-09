@@ -123,45 +123,39 @@ def is_expired(input):
     else:
         return False
 
-try:
-    with open('aa_events.json', 'r') as f:
-        events_json = f.read()
-        aa_events_dict = json.loads(events_json)
-        if is_expired(aa_events_dict["pagination"]):
-            raise FileNotFoundError
+cu_params = {
+    "sort_by": "date",
+    "location.address": "Champaign",
+    "location.within": "10mi",
+    "page": 1}
+aa_params = {
+    "sort_by": "date",
+    "location.address": "AnnArbor",
+    "location.within": "10mi",
+    "page": 1}
 
-except FileNotFoundError:
-    response = make_eventbrite_request(
-        'https://www.eventbriteapi.com/v3/events/search/',
-        {
-            "sort_by": "date",
-            "location.address": "AnnArbor",
-            "location.within": "10mi",
-            "page": 1})
-    with open('aa_events.json', 'w') as f:
-        aa_events_dict = json.loads(response.text)
-        write_time_stamp(aa_events_dict["pagination"], 2)
-        f.write(json.dumps(aa_events_dict))
 
-try:
-    with open('cu_events.json', 'r') as f:
-        events_json = f.read()
-        cu_events_dict = json.loads(events_json)
-        if is_expired(cu_events_dict["pagination"]):
-            raise FileNotFoundError
+def prepare_data(filename, method, params):
+    events_dict = {}
+    try:
+        with open(filename, 'r') as f:
+            events_json = f.read()
+            events_dict = json.loads(events_json)
+            if is_expired(events_dict["pagination"]):
+                raise FileNotFoundError
 
-except FileNotFoundError:
-    response = make_eventbrite_request(
-        'https://www.eventbriteapi.com/v3/events/search/',
-        {
-            "sort_by": "date",
-            "location.address": "Champaign",
-            "location.within": "10mi",
-            "page": 1})
-    with open('cu_events.json', 'w') as f:
-        cu_events_dict = json.loads(response.text)
-        write_time_stamp(cu_events_dict["pagination"], 2)
-        f.write(json.dumps(cu_events_dict))
+    except FileNotFoundError:
+        response = make_eventbrite_request(
+            'https://www.eventbriteapi.com/v3' + method,
+            params)
+        with open(filename, 'w') as f:
+            events_dict = json.loads(response.text)
+            write_time_stamp(events_dict["pagination"], 2)
+            f.write(json.dumps(events_dict))
+    return events_dict
+
+aa_events_dict = prepare_data("aa_events.json", "/events/search/", aa_params)
+cu_events_dict = prepare_data("cu_events.json", "/events/search/", cu_params)
 
 
 eventToCSV("aa_events.csv", aa_events_dict["events"], [
